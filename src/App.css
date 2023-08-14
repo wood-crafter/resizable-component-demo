@@ -31,3 +31,27 @@
   top: 0;
   width: 3px;
 }
+
+.resizer-t {
+  cursor: row-resize;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 3px;
+}
+
+.resizer-b {
+  cursor: row-resize;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+}
+
+.resizer-l {
+  cursor: col-resize;
+  height: 100%;
+  left: 0;
+  top: 0;
+  width: 3px;
+}

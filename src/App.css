@@ -1,7 +1,7 @@
 .container {
   border-radius: 5px;
-  width: 800px;
-  height: 800px;
+  width: 100vw;
+  height: 100vh;
   background-color: bisque;
   position: relative;
 }
@@ -54,4 +54,13 @@
   left: 0;
   top: 0;
   width: 3px;
+}
+
+.dont-push {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  border: 2px solid black;
 }

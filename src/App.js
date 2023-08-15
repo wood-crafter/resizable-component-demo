@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import './App.css';
 
 function App() {
@@ -7,20 +7,25 @@ function App() {
   const refTop = useRef(null)
   const refRight = useRef(null)
   const refBottom = useRef(null)
+  const refContainer = useRef(null)
 
   useEffect(() => {
+    const container = refContainer.current
+    const containerStyle = window.getComputedStyle(container)
     const resizableElement = ref.current
     const styles = window.getComputedStyle(resizableElement)
     let width = parseInt(styles.width, 10)
     let height = parseInt(styles.height, 10)
     let x = 0;
     let y = 0;
-
-    resizableElement.style.top = '50px'
-    resizableElement.style.left = '50px'
+    resizableElement.style.top = '5px'
+    resizableElement.style.left = '5px'
 
     // Right
     const onMouseMoveRightResize = (event) => {
+      if (event.clientX >= parseInt(containerStyle.width, 10) - 5) {
+        return
+      }
       const dx = event.clientX - x
       x = event.clientX
       width = width + dx
@@ -72,6 +77,9 @@ function App() {
     }
     // Left
     const onMouseMoveLeftResize = (event) => {
+      if (event.clientX < 5) {
+        return
+      }
       const dx = event.clientX - x
       x = event.clientX
       width = width - dx
@@ -105,13 +113,14 @@ function App() {
   }, [])
 
   return (
-    <div className="container">
+    <div className="container" ref={refContainer}>
       <div ref={ref} className='resizable'>
         <div ref={refLeft} className='resizer resizer-l'></div>
         <div ref={refTop} className='resizer resizer-t'></div>
         <div ref={refRight} className='resizer resizer-r'></div>
         <div ref={refBottom} className='resizer resizer-b'></div>
       </div>
+      <div className='dont-push'>Dont push</div>
     </div>
   );
 }

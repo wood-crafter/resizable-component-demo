@@ -8,10 +8,17 @@ function App() {
   const refRight = useRef(null)
   const refBottom = useRef(null)
   const refContainer = useRef(null)
+  const refDontPush = useRef(null)
 
   useEffect(() => {
     const container = refContainer.current
     const containerStyle = window.getComputedStyle(container)
+    const dontPush = refDontPush.current
+    const dontPushStyle = window.getComputedStyle(dontPush)
+    const leftDontPush = parseInt(dontPushStyle.left) - parseInt(dontPushStyle.border)
+    const rightDontPush = leftDontPush + parseInt(dontPushStyle.width) + 2 * parseInt(dontPushStyle.border)
+    const topDontPush = parseInt(dontPushStyle.top) - parseInt(dontPushStyle.border)
+    const bottomDontPush = topDontPush + parseInt(dontPushStyle.height) + 2 * parseInt(dontPushStyle.border)
     const resizableElement = ref.current
     const styles = window.getComputedStyle(resizableElement)
     let width = parseInt(styles.width, 10)
@@ -26,6 +33,18 @@ function App() {
       if (event.clientX >= parseInt(containerStyle.width, 10) - 5) {
         return
       }
+      const resizableElement = ref.current
+      const resizableStyles = window.getComputedStyle(resizableElement)
+      const topResizable = parseInt(resizableStyles.top) - parseInt(resizableStyles.border)
+      const bottomResizable = topResizable + parseInt(resizableStyles.height) + 2 * parseInt(resizableStyles.border)
+
+      // is current resizing component between dont push (0y)
+      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush)) {
+        if (event.clientX >= leftDontPush) {
+          return
+        }
+      }
+
       const dx = event.clientX - x
       x = event.clientX
       width = width + dx
@@ -120,7 +139,7 @@ function App() {
         <div ref={refRight} className='resizer resizer-r'></div>
         <div ref={refBottom} className='resizer resizer-b'></div>
       </div>
-      <div className='dont-push'>Dont push</div>
+      <div ref={refDontPush} className='dont-push'>Dont push</div>
     </div>
   );
 }

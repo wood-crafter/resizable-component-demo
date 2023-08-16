@@ -9,16 +9,41 @@ function App() {
   const refBottom = useRef(null)
   const refContainer = useRef(null)
   const refDontPush = useRef(null)
+  const refDontOverlap1 = useRef(null)
+  const refDontOverlap2 = useRef(null)
+  const refDontOverlap3 = useRef(null)
+  const refDontOverlap4 = useRef(null)
+  const refDontOverlap5 = useRef(null)
+  const refDontOverlap6 = useRef(null)
+  const refDontOverlap7 = useRef(null)
+  const refDontOverlap8 = useRef(null)
+  const refDontOverlap9 = useRef(null)
+  const barriers = [refDontPush, refDontOverlap1, refDontOverlap2, refDontOverlap3, refDontOverlap4, refDontOverlap5, refDontOverlap6, refDontOverlap7, refDontOverlap8, refDontOverlap9]
+
+  const getPositionsByRefs = (refs) => {
+    const positions = []
+    refs.forEach(item => {
+      const element = item.current
+      const elementStyle = window.getComputedStyle(element)
+      const leftDontPush = parseInt(elementStyle.left) - parseInt(elementStyle.border)
+      const rightDontPush = leftDontPush + parseInt(elementStyle.width) + 2 * parseInt(elementStyle.border)
+      const topDontPush = parseInt(elementStyle.top) - parseInt(elementStyle.border)
+      const bottomDontPush = topDontPush + parseInt(elementStyle.height) + 2 * parseInt(elementStyle.border)
+
+      positions.push({
+        leftDontPush,
+        rightDontPush,
+        topDontPush,
+        bottomDontPush
+      })
+    })
+    return positions
+  }
 
   useEffect(() => {
     const container = refContainer.current
     const containerStyle = window.getComputedStyle(container)
-    const dontPush = refDontPush.current
-    const dontPushStyle = window.getComputedStyle(dontPush)
-    const leftDontPush = parseInt(dontPushStyle.left) - parseInt(dontPushStyle.border)
-    const rightDontPush = leftDontPush + parseInt(dontPushStyle.width) + 2 * parseInt(dontPushStyle.border)
-    const topDontPush = parseInt(dontPushStyle.top) - parseInt(dontPushStyle.border)
-    const bottomDontPush = topDontPush + parseInt(dontPushStyle.height) + 2 * parseInt(dontPushStyle.border)
+    const positions = getPositionsByRefs(barriers)
     const resizableElement = ref.current
     const styles = window.getComputedStyle(resizableElement)
     let width = parseInt(styles.width, 10)
@@ -37,13 +62,20 @@ function App() {
       const resizableStyles = window.getComputedStyle(resizableElement)
       const topResizable = parseInt(resizableStyles.top) - parseInt(resizableStyles.border)
       const bottomResizable = topResizable + parseInt(resizableStyles.height) + 2 * parseInt(resizableStyles.border)
+      let shouldStopResize = false
 
       // is current resizing component between dont push (0y)
-      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush) || (bottomResizable >= bottomDontPush && topResizable <= topDontPush)) {
-        if (x < leftDontPush && event.clientX >= leftDontPush && event.clientX > x) {
-          return
+      positions.every(item => {
+        if ((topResizable >= item.topDontPush && topResizable <= item.bottomDontPush) || (bottomResizable >= item.topDontPush && bottomResizable <= item.bottomDontPush) || (bottomResizable >= item.bottomDontPush && topResizable <= item.topDontPush)) {
+          if (x < item.leftDontPush && event.clientX >= item.leftDontPush && event.clientX > x) {
+            shouldStopResize = true
+            return false
+          }
         }
-      }
+        return true
+      })
+
+      if (shouldStopResize) return
 
       const dx = event.clientX - x
       x = event.clientX
@@ -66,11 +98,17 @@ function App() {
       const resizableStyles = window.getComputedStyle(resizableElement)
       const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
       const rightResizable = leftResizable + parseInt(resizableStyles.width) + 2 * parseInt(resizableStyles.border)
-      if ((leftResizable >= leftDontPush && leftResizable <= rightDontPush) || (rightResizable >= leftDontPush && rightResizable <= rightDontPush) || (leftResizable <= leftDontPush && rightResizable >= rightDontPush)) {
-        if (y > bottomDontPush && event.clientY <= bottomDontPush && event.clientY < y) {
-          return
+      let shouldStopResize = false
+      positions.every(item => {
+        if ((leftResizable >= item.leftDontPush && leftResizable <= item.rightDontPush) || (rightResizable >= item.leftDontPush && rightResizable <= item.rightDontPush) || (leftResizable <= item.leftDontPush && rightResizable >= item.rightDontPush)) {
+          if (y > item.bottomDontPush && event.clientY <= item.bottomDontPush && event.clientY < y) {
+            shouldStopResize = true
+            return false
+          }
         }
-      }
+        return true
+      })
+      if (shouldStopResize) return
       const dy = event.clientY - y
       height = height - dy
       y = event.clientY
@@ -92,11 +130,17 @@ function App() {
       const resizableStyles = window.getComputedStyle(resizableElement)
       const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
       const rightResizable = leftResizable + parseInt(resizableStyles.width) + 2 * parseInt(resizableStyles.border)
-      if ((leftResizable >= leftDontPush && leftResizable <= rightDontPush) || (rightResizable >= leftDontPush && rightResizable <= rightDontPush) || (leftResizable <= leftDontPush && rightResizable >= rightDontPush)) {
-        if (y < topDontPush && event.clientY >= topDontPush && event.clientY > y) {
-          return
+      let shouldStopResize = false
+      positions.every(item => {
+        if ((leftResizable >= item.leftDontPush && leftResizable <= item.rightDontPush) || (rightResizable >= item.leftDontPush && rightResizable <= item.rightDontPush) || (leftResizable <= item.leftDontPush && rightResizable >= item.rightDontPush)) {
+          if (y < item.topDontPush && event.clientY >= item.topDontPush && event.clientY > y) {
+            shouldStopResize = true
+            return false
+          }
         }
-      }
+        return true
+      })
+      if (shouldStopResize) return
       const dy = event.clientY - y
       height = height + dy
       y = event.clientY
@@ -122,12 +166,17 @@ function App() {
       const topResizable = parseInt(resizableStyles.top) - parseInt(resizableStyles.border)
       const bottomResizable = topResizable + parseInt(resizableStyles.height) + 2 * parseInt(resizableStyles.border)
 
-      // is current resizing component between dont push (0y)
-      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush) || (bottomResizable >= bottomDontPush && topResizable <= topDontPush)) {
-        if (x > rightDontPush && event.clientX <= rightDontPush && event.clientX < x) {
-          return
+      let shouldStopResize = false
+      positions.every(item => {
+        if ((topResizable >= item.topDontPush && topResizable <= item.bottomDontPush) || (bottomResizable >= item.topDontPush && bottomResizable <= item.bottomDontPush) || (bottomResizable >= item.bottomDontPush && topResizable <= item.topDontPush)) {
+          if (x > item.rightDontPush && event.clientX <= item.rightDontPush && event.clientX < x) {
+            shouldStopResize = true
+            return false
+          }
         }
-      }
+        return true
+      })
+      if (shouldStopResize) return
       const dx = event.clientX - x
       x = event.clientX
       width = width - dx
@@ -169,7 +218,16 @@ function App() {
         <div ref={refRight} className='resizer resizer-r'></div>
         <div ref={refBottom} className='resizer resizer-b'></div>
       </div>
-      <div ref={refDontPush} className='dont-push'>Dont push</div>
+      <div ref={refDontPush} className='barrier dont-push'>Dont push</div>
+      <div ref={refDontOverlap1} className='barrier dont-overlap1'>Dont overlap</div>
+      <div ref={refDontOverlap2} className='barrier dont-overlap2'>Dont overlap</div>
+      <div ref={refDontOverlap3} className='barrier dont-overlap3'>Dont overlap</div>
+      <div ref={refDontOverlap4} className='barrier dont-overlap4'>Dont overlap</div>
+      <div ref={refDontOverlap5} className='barrier dont-overlap5'>Dont overlap</div>
+      <div ref={refDontOverlap6} className='barrier dont-overlap6'>Dont overlap</div>
+      <div ref={refDontOverlap7} className='barrier dont-overlap7'>Dont overlap</div>
+      <div ref={refDontOverlap8} className='barrier dont-overlap8'>Dont overlap</div>
+      <div ref={refDontOverlap9} className='barrier dont-overlap9'>Dont overlap</div>
     </div>
   );
 }

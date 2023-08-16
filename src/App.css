@@ -4,6 +4,9 @@
   height: 100vh;
   background-color: bisque;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .resizable {
@@ -63,4 +66,12 @@
   top: 50px;
   right: 50px;
   border: 2px solid black;
+}
+
+.resizable-element {
+  width: 200px;
+  height: 150px;
+  border: 1px solid #ccc;
+  resize: both; /* Enables both horizontal and vertical resizing */
+  overflow: auto; /* Optional, adds scrollbars when content overflows */
 }

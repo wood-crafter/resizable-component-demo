@@ -39,8 +39,8 @@ function App() {
       const bottomResizable = topResizable + parseInt(resizableStyles.height) + 2 * parseInt(resizableStyles.border)
 
       // is current resizing component between dont push (0y)
-      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush)) {
-        if (event.clientX >= leftDontPush) {
+      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush) || (bottomResizable >= bottomDontPush && topResizable <= topDontPush)) {
+        if (x < leftDontPush && event.clientX >= leftDontPush && event.clientX > x) {
           return
         }
       }
@@ -62,6 +62,15 @@ function App() {
     }
     // Top
     const onMouseMoveTopResize = (event) => {
+      const resizableElement = ref.current
+      const resizableStyles = window.getComputedStyle(resizableElement)
+      const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
+      const rightResizable = leftResizable + parseInt(resizableStyles.width) + 2 * parseInt(resizableStyles.border)
+      if ((leftResizable >= leftDontPush && leftResizable <= rightDontPush) || (rightResizable >= leftDontPush && rightResizable <= rightDontPush) || (leftResizable <= leftDontPush && rightResizable >= rightDontPush)) {
+        if (y > bottomDontPush && event.clientY <= bottomDontPush && event.clientY < y) {
+          return
+        }
+      }
       const dy = event.clientY - y
       height = height - dy
       y = event.clientY
@@ -79,6 +88,15 @@ function App() {
     }
     // Bottom
     const onMouseMoveBottomResize = (event) => {
+      const resizableElement = ref.current
+      const resizableStyles = window.getComputedStyle(resizableElement)
+      const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
+      const rightResizable = leftResizable + parseInt(resizableStyles.width) + 2 * parseInt(resizableStyles.border)
+      if ((leftResizable >= leftDontPush && leftResizable <= rightDontPush) || (rightResizable >= leftDontPush && rightResizable <= rightDontPush) || (leftResizable <= leftDontPush && rightResizable >= rightDontPush)) {
+        if (y < topDontPush && event.clientY >= topDontPush && event.clientY > y) {
+          return
+        }
+      }
       const dy = event.clientY - y
       height = height + dy
       y = event.clientY
@@ -98,6 +116,17 @@ function App() {
     const onMouseMoveLeftResize = (event) => {
       if (event.clientX < 5) {
         return
+      }
+      const resizableElement = ref.current
+      const resizableStyles = window.getComputedStyle(resizableElement)
+      const topResizable = parseInt(resizableStyles.top) - parseInt(resizableStyles.border)
+      const bottomResizable = topResizable + parseInt(resizableStyles.height) + 2 * parseInt(resizableStyles.border)
+
+      // is current resizing component between dont push (0y)
+      if ((topResizable >= topDontPush && topResizable <= bottomDontPush) || (bottomResizable >= topDontPush && bottomResizable <= bottomDontPush) || (bottomResizable >= bottomDontPush && topResizable <= topDontPush)) {
+        if (x > rightDontPush && event.clientX <= rightDontPush && event.clientX < x) {
+          return
+        }
       }
       const dx = event.clientX - x
       x = event.clientX
@@ -123,6 +152,7 @@ function App() {
     resizerBottom.addEventListener('mousedown', onMouseDownBottomResize)
     const resizerLeft = refLeft.current
     resizerLeft.addEventListener('mousedown', onMouseDownLeftResize)
+
     return () => {
       resizerRight.removeEventListener('mousedown', onMouseDownRightResize)
       resizerTop.removeEventListener('mousedown', onMouseDownTopResize)

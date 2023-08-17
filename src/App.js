@@ -94,6 +94,9 @@ function App() {
     }
     // Top
     const onMouseMoveTopResize = (event) => {
+      if (event.clientY < 5) {
+        return
+      }
       const resizableElement = ref.current
       const resizableStyles = window.getComputedStyle(resizableElement)
       const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
@@ -126,6 +129,9 @@ function App() {
     }
     // Bottom
     const onMouseMoveBottomResize = (event) => {
+      if (event.clientY >= parseInt(containerStyle.height, 10) - 5) {
+        return
+      }
       const resizableElement = ref.current
       const resizableStyles = window.getComputedStyle(resizableElement)
       const leftResizable = parseInt(resizableStyles.left) - parseInt(resizableStyles.border)
@@ -213,6 +219,7 @@ function App() {
   return (
     <div className="container" ref={refContainer}>
       <div ref={ref} className='resizable'>
+        Resize me
         <div ref={refLeft} className='resizer resizer-l'></div>
         <div ref={refTop} className='resizer resizer-t'></div>
         <div ref={refRight} className='resizer resizer-r'></div>
